@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 
 import com.enrolment.student.entities.Course;
 import com.enrolment.student.entities.CourseDTO;
 import com.enrolment.student.entities.Student;
 import com.enrolment.student.entities.StudentDTO;
 
+@Component
 public class ObjectConversion {
 	static ModelMapper mapper = new ModelMapper();
 	
