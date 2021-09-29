@@ -2,7 +2,6 @@ package com.enrolment.student.controller;
 
 import java.util.List;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.enrolment.student.entities.Student;
 import com.enrolment.student.entities.StudentDTO;
 import com.enrolment.student.service.StudentService;
+import com.enrolment.student.util.ObjectConversion;
 
 @RestController
 @RequestMapping(path = "/v1/api")
@@ -25,13 +25,13 @@ public class StudentController {
 	@Autowired
 	public StudentService studentService;
 
-	ModelMapper mapper = new ModelMapper();
+	@Autowired
+	public ObjectConversion conversion;
 
-	@SuppressWarnings("unchecked")
 	@GetMapping(path = "/all-students", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<StudentDTO> getAllStudents() {
 		List<Student> students = studentService.getAllStudents();
-		return (List<StudentDTO>) mapper.map(students, StudentDTO.class);
+		return conversion.studentEntityToDTOList(students);
 	}
 
 	@GetMapping(path = "/student/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,7 +39,7 @@ public class StudentController {
 		if (id == null)
 			return null;
 		Student student = studentService.getStudentById(id);
-		return mapper.map(student, StudentDTO.class);
+		return (student != null) ? conversion.studentEntityToDTO(student) : null;
 	}
 
 	@PostMapping(path = "/new-student", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,9 +47,9 @@ public class StudentController {
 		if (studentDTO == null) {
 			return null;
 		}
-		Student student = mapper.map(studentDTO, Student.class);
+		Student student = conversion.studentDTOToEntity(studentDTO);
 		student = studentService.addNewStudent(student);
-		return mapper.map(student, StudentDTO.class);
+		return conversion.studentEntityToDTO(student);
 	}
 
 	@PutMapping(path = "/update-student", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,9 +57,9 @@ public class StudentController {
 		if (studentDTO == null)
 			return null;
 
-		Student student = mapper.map(studentDTO, Student.class);
+		Student student = conversion.studentDTOToEntity(studentDTO);
 		student = studentService.updateStudent(student);
-		return (student != null) ? mapper.map(student, StudentDTO.class) : null;
+		return (student != null) ? conversion.studentEntityToDTO(student) : null;
 	}
 
 	@DeleteMapping(path = "/delete-student/{id}")
@@ -67,18 +67,16 @@ public class StudentController {
 		studentService.deleteStudent(id);
 	}
 
-	@SuppressWarnings("unchecked")
 	@GetMapping(path = "/course-without-student", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<StudentDTO> getStudentsWithoutAnyStudents() {
 		List<Student> students = studentService.getStudentsWithoutAnyCourses();
-		return (students != null) ? (List<StudentDTO>) mapper.map(students, StudentDTO.class) : null;
+		return (students != null) ? conversion.studentEntityToDTOList(students) : null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@GetMapping(path = "/student-by-course/{courseName}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<StudentDTO> getStudentsByCourse(@PathVariable(name = "courseName") String courseName) {
 		List<Student> students = studentService.getStudentByCourse(courseName);
-		return (students != null) ? (List<StudentDTO>) mapper.map(students, StudentDTO.class) : null;
+		return (students != null) ? conversion.studentEntityToDTOList(students) : null;
 	}
 
 }
