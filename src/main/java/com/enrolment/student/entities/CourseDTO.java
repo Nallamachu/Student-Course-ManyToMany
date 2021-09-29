@@ -1,10 +1,13 @@
 package com.enrolment.student.entities;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CourseDTO {
+public class CourseDTO implements Serializable{
 
+	private static final long serialVersionUID = 1L;
+	
 	private long id;
 	private String name;
 	private Set<Student> students = new HashSet<>();
