@@ -3,7 +3,9 @@ package com.enrolment.student.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,37 +31,44 @@ public class CourseController {
 	public ObjectConversion conversion;
 
 	@GetMapping(path = "/all-courses", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<CourseDTO> getAllCourses() {
+	public ResponseEntity<List<CourseDTO>> getAllCourses() {
 		List<Course> courses = courseService.getAllCourses();
-		return (courses != null) ? conversion.courseEntityToDTOList(courses) : null;
+		if(courses != null) {
+			List<CourseDTO> courseDTOs = conversion.courseEntityToDTOList(courses);
+			return new ResponseEntity<List<CourseDTO>>(courseDTOs, HttpStatus.OK);
+		}
+		return new ResponseEntity("Exception while getting all courses", HttpStatus.EXPECTATION_FAILED);
 	}
 
 	@GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public CourseDTO getCourseById(@PathVariable(name = "id") Long id) {
+	public ResponseEntity<CourseDTO> getCourseById(@PathVariable(name = "id") Long id) {
 		if (id == null)
 			return null;
 		Course course = courseService.getCourseById(id);
-		return (course != null) ? conversion.courseEntityToDTO(course) : null;
+		return (course != null) ? new ResponseEntity<CourseDTO>(conversion.courseEntityToDTO(course),HttpStatus.OK) 
+				: new ResponseEntity("Exception while getting course by id", HttpStatus.EXPECTATION_FAILED);
 	}
 
 	@PostMapping(path = "/new-course", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public CourseDTO addNewCourse(@RequestBody CourseDTO courseDTO) {
+	public ResponseEntity<CourseDTO> addNewCourse(@RequestBody CourseDTO courseDTO) {
 		if (courseDTO == null) {
 			return null;
 		}
 		Course course = conversion.courseDTOToEntity(courseDTO);
 		course = courseService.addNewCourse(course);
-		return (course != null) ? conversion.courseEntityToDTO(course) : null;
+		return (course != null) ? new ResponseEntity<CourseDTO>(conversion.courseEntityToDTO(course),HttpStatus.OK) 
+				: new ResponseEntity("Exception while getting course by id", HttpStatus.EXPECTATION_FAILED);
 	}
 
 	@PutMapping(path = "/update-course", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public CourseDTO updateCourse(@RequestBody CourseDTO courseDTO) {
+	public ResponseEntity<CourseDTO> updateCourse(@RequestBody CourseDTO courseDTO) {
 		if (courseDTO == null)
 			return null;
 
 		Course course = conversion.courseDTOToEntity(courseDTO);
 		course = courseService.updateCourse(course);
-		return (course != null) ? conversion.courseEntityToDTO(course) : null;
+		return (course != null) ? new ResponseEntity<CourseDTO>(conversion.courseEntityToDTO(course),HttpStatus.OK) 
+				: new ResponseEntity("Exception while updating the course", HttpStatus.EXPECTATION_FAILED);
 	}
 
 	@DeleteMapping(path = "/delete-course/{id}")
@@ -68,15 +77,20 @@ public class CourseController {
 	}
 
 	@GetMapping(path = "/course-without-student", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<CourseDTO> getCoursesWithoutAnyStudents() {
+	public ResponseEntity<List<CourseDTO>> getCoursesWithoutAnyStudents() {
 		List<Course> courses = courseService.getCoursesWithoutAnyStudents();
-		return (courses != null) ? conversion.courseEntityToDTOList(courses) : null;
+		if(courses !=null) {
+			List<CourseDTO> courseDTOs = conversion.courseEntityToDTOList(courses);
+			return new ResponseEntity<List<CourseDTO>>(courseDTOs, HttpStatus.OK);
+		}
+		return new ResponseEntity("Exception While getting the courses wihout students", HttpStatus.EXPECTATION_FAILED);
 	}
 
 	@GetMapping(path = "/course-by-student", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<CourseDTO> getCoursesByStudent(Long studentId) {
+	public ResponseEntity<List<CourseDTO>> getCoursesByStudent(Long studentId) {
 		List<Course> courses = courseService.getCoursesByStudent(studentId);
-		return (courses != null) ? conversion.courseEntityToDTOList(courses) : null;
+		return (courses != null) ? new ResponseEntity<List<CourseDTO>>(conversion.courseEntityToDTOList(courses),HttpStatus.OK) 
+				: new ResponseEntity("Exception while getting course by id", HttpStatus.EXPECTATION_FAILED);
 	}
 
 }
