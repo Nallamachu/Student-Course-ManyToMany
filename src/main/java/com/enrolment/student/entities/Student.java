@@ -1,5 +1,6 @@
 package com.enrolment.student.entities;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -18,8 +19,10 @@ import javax.persistence.Table;
 
 @Entity
 @Table
-public class Student {
+public class Student implements Serializable{
 
+	private static final long serialVersionUID = 1L;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column
@@ -29,7 +32,7 @@ public class Student {
 	@Column
 	private String lastName;
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL })
 	@JoinTable(name = "Student_Course", joinColumns = { @JoinColumn(name = "student_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "course_id") })
 	private Set<Course> courses = new HashSet<Course>();
@@ -85,7 +88,7 @@ public class Student {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(courses, firstName, id, lastName);
+		return Objects.hash(firstName, id, lastName);
 	}
 
 	@Override
@@ -97,7 +100,7 @@ public class Student {
 		if (getClass() != obj.getClass())
 			return false;
 		Student other = (Student) obj;
-		return Objects.equals(courses, other.courses) && Objects.equals(firstName, other.firstName) && id == other.id
+		return Objects.equals(firstName, other.firstName) && id == other.id
 				&& Objects.equals(lastName, other.lastName);
 	}
 
