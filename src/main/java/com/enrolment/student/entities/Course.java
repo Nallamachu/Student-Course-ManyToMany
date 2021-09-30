@@ -15,6 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table
 public class Course implements Serializable{
@@ -29,6 +31,7 @@ public class Course implements Serializable{
 	private String name;
 
 	@ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL }, mappedBy = "courses")
+	@JsonIgnoreProperties("courses")
 	private Set<Student> students = new HashSet<>();
 
 	public Course() {
